@@ -5,7 +5,9 @@
 	pozo/1, %Nos dice si una ficha está en el pozo (no vista)                                              
 	op_no_tiene/1, %Nos indica si un oponente no tiene un número                                           
 	derecho/1, %Nos indica el número abierto en el extremo derecho                                         
-	izquierdo/1. %Nos indica el número abierto en el extremo izquierdo
+	izquierdo/1, %Nos indica el número abierto en el extremo izquierdo
+  num_fichas_dbw/1, %Numero de fichas que tenemos 
+  num_fichas_op/1. %Numero de fichas que tiene el oponente
 
 empieza_juego():-
   retractall(pozo(_)),
@@ -55,7 +57,10 @@ empieza_juego():-
   assertz(cuenta([3,7])),
   assertz(cuenta([4,7])),
   assertz(cuenta([5,7])),
-  assertz(cuenta([6,7])).
+  assertz(cuenta([6,7])),
+
+  assertz(num_fichas_op(7)),
+  assertz(num_fichas_dbw(0)).
 
 /*
 Métodos que actualizan las cuentas de fichas
@@ -87,11 +92,30 @@ Actualiza la mano, y las cuentas de las fichas según
 la ficha que tomamos
 */
 % Se debe registrar la ficha como [Menor|Mayor]
-tomo_ficha(FichaOrd):-
+tomo_ficha(Mano):-
+  ordenar(Mano,FichaOrd),
   assertz(tengo(FichaOrd)),
   retract(pozo(FichaOrd)),
-  actualiza_cuentas(FichaOrd).
+  actualiza_cuentas(FichaOrd),
 
+  retract(num_fichas_dbw(Num)), 
+  Newnum is Num+1, 
+  assertz(num_fichas_dbw(Newnum)).
+
+toma_ficha_op():- 
+  retract(num_fichas_op(Num)),
+  Newnum is Num+1, 
+  assertz(num_fichas_op(Newnum)).
+
+pone_ficha_dbw():- 
+  retract(num_fichas_dbw(Num)),
+  Newnum is Num-1, 
+  assertz(num_fichas_dbw(Newnum)).
+
+pone_ficha_op():-
+  retract(num_fichas_op(Num)),
+  Newnum is Num-1, 
+  assertz(num_fichas_op(Newnum)).
 
 /*
 Método para regsitrar la mano inicial de 7 fichas que tomamos
@@ -100,39 +124,72 @@ Actualizando la mano, el pozo y las cuentas
 mano_inicial([]):-!.
 
 mano_inicial([Mano|RestoMano]) :-
-  ordenar(Mano,FichaOrd),
-  tomo_ficha(FichaOrd),
+  tomo_ficha(Mano),
   mano_inicial(RestoMano).
 
-juega_dbw([Val1,Val2|_],"D") :-
-  derecho(ValD),
-  retract(derecho(ValD)),
-  (ValD == Val2 ->
-  assertz(derecho(Val2)) ; 
-  assertz(derecho(Val1))
-  )
-  retract(tengo([Val1,Val2])),
-  assertz(jugado([Val1,Val2])). 
-
-juega_dbw([Val1,Val2|_],"I") :-
-  retract(izquierdo(_)),
-  assertz(izquierdo(Val2)),
-  retract(tengo([Val1,Val2])),
+pon_primera_ficha(Ficha, Jugador) :-
+  ordenar(Ficha, [Val1,Val2]), 
+  assertz(derecho(Val2)),
+  assertz(izquierdo(Val1)),
+  (Jugador == "DBW" -> 
+  retract(tengo([Val1,Val2])); 
+  retract(pozo([Val1,Val2])), 
+  actualiza_cuentas([Val1,Val2])), 
   assertz(jugado([Val1,Val2])).
 
-juega_op([Val1,Val2|_],"D") :-
+juega_dbw(Ficha,"D") :-
+  ordenar(Ficha, [Val1, Val2]),
+  derecho(ValD),
   retract(derecho(_)),
-  assertz(derecho(Val2)),
-  assertz(jugado([Val1,Val2])),
-  retract(pozo([Val1,Val2])),
-  actualiza_cuentas([Val1,Val2]).
+  (ValD == Val2 ->
+  assertz(derecho(Val1)) ; 
+  assertz(derecho(Val2))),
 
-juega_op([Val1,Val2|_],"I") :-
+  retract(tengo([Val1,Val2])),
+  assertz(jugado([Val1,Val2])), 
+  
+  pone_ficha_dbw().
+
+juega_dbw(Ficha,"I") :-
+  ordenar(Ficha, [Val1, Val2]),
+  izquierdo(ValI),
   retract(izquierdo(_)),
-  assertz(izquierdo(Val2)),
+  (ValI == Val2 ->  
+  assertz(izquierdo(Val1)) ; 
+  assertz(izquierdo(Val2)) ), 
+
+  retract(tengo([Val1,Val2])),
+  assertz(jugado([Val1,Val2])), 
+
+  pone_ficha_dbw().
+
+juega_op(Ficha,"D") :-
+  ordenar(Ficha, [Val1, Val2]),
+  derecho(ValD),
+  retract(derecho(_)),
+  (ValD == Val2 ->
+  assertz(derecho(Val1)) ; 
+  assertz(derecho(Val2))),
+
   assertz(jugado([Val1,Val2])),
   retract(pozo([Val1,Val2])),
-  actualiza_cuentas([Val1,Val2]).
+  actualiza_cuentas([Val1,Val2]), 
+  
+  pone_ficha_op().
+
+juega_op(Ficha,"I") :-
+  ordenar(Ficha, [Val1, Val2]),
+  izquierdo(ValI),
+  retract(izquierdo(_)),
+  (ValI == Val2 ->
+  assertz(izquierdo(Val1)) ; 
+  assertz(izquierdo(Val2))),
+
+  assertz(jugado([Val1,Val2])),
+  retract(pozo([Val1,Val2])),
+  actualiza_cuentas([Val1,Val2]),
+  
+  pone_ficha_op().
 
 
 imprime_mano(X) :-
