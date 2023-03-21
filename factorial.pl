@@ -16,5 +16,6 @@ factorial(N,Resp) :-
 combinacion(N,K,Resp):-
     factorial(N,Fn),
     factorial(K,Fk),
-    factorial(N-K,Fnk),
+    DifNK is N-K,
+    factorial(DifNK,Fnk),
     Resp is Fn/(Fnk*Fk).
