@@ -1,6 +1,6 @@
 carga_archivos:-
     [factorial],
-    [domino].
+    [domino_ed].
 funcion_heuristica(Ficha,ValHeur):-
     ( perdio_dbw ->
         perdio_dbw(ValHeur);
