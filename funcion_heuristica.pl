@@ -73,10 +73,12 @@ puede_ganar_dbw:-
 
 perdio_dbw:-
     num_fichas_op(0).
+
 empate:-
     derecho(ValD), izquierdo(ValI),
     cuenta([ValD, 0]),
     cuenta([ValI, 0]).
+    
 empate(ValI,ValD):-
     derecho(ValD), izquierdo(ValI),
     cuenta([ValD, 0]),
