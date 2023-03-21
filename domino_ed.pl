@@ -9,7 +9,7 @@
   num_fichas_dbw/1, %Numero de fichas que tenemos 
   num_fichas_op/1. %Numero de fichas que tiene el oponente
 
-empieza_juego():-
+empieza_juego:-
   retractall(pozo(_)),
   retractall(tengo(_)),
   retractall(jugado(_)),
@@ -102,17 +102,17 @@ tomo_ficha(Mano):-
   Newnum is Num+1, 
   assertz(num_fichas_dbw(Newnum)).
 
-toma_ficha_op():- 
+toma_ficha_op:- 
   retract(num_fichas_op(Num)),
   Newnum is Num+1, 
   assertz(num_fichas_op(Newnum)).
 
-pone_ficha_dbw():- 
+pone_ficha_dbw:- 
   retract(num_fichas_dbw(Num)),
   Newnum is Num-1, 
   assertz(num_fichas_dbw(Newnum)).
 
-pone_ficha_op():-
+pone_ficha_op:-
   retract(num_fichas_op(Num)),
   Newnum is Num-1, 
   assertz(num_fichas_op(Newnum)).
@@ -148,7 +148,7 @@ juega_dbw(Ficha,"D") :-
   retract(tengo([Val1,Val2])),
   assertz(jugado([Val1,Val2])), 
   
-  pone_ficha_dbw().
+  pone_ficha_dbw.
 
 juega_dbw(Ficha,"I") :-
   ordenar(Ficha, [Val1, Val2]),
@@ -161,7 +161,7 @@ juega_dbw(Ficha,"I") :-
   retract(tengo([Val1,Val2])),
   assertz(jugado([Val1,Val2])), 
 
-  pone_ficha_dbw().
+  pone_ficha_dbw.
 
 juega_op(Ficha,"D") :-
   ordenar(Ficha, [Val1, Val2]),
@@ -175,7 +175,7 @@ juega_op(Ficha,"D") :-
   retract(pozo([Val1,Val2])),
   actualiza_cuentas([Val1,Val2]), 
   
-  pone_ficha_op().
+  pone_ficha_op.
 
 juega_op(Ficha,"I") :-
   ordenar(Ficha, [Val1, Val2]),
@@ -189,7 +189,7 @@ juega_op(Ficha,"I") :-
   retract(pozo([Val1,Val2])),
   actualiza_cuentas([Val1,Val2]),
   
-  pone_ficha_op().
+  pone_ficha_op.
 
 
 imprime_mano(X) :-
@@ -215,19 +215,5 @@ Evalua, dado las fichas en mano, en el pozo,
 y lo que sabemos de la mano del jugador, el valor
 heurístico del estado. 
 */
-evalua_estado():-
+evalua_estado:-
 !.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
