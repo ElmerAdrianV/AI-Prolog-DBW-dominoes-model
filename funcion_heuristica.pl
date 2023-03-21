@@ -24,9 +24,9 @@ calcula_val_heur_mejor_mov([X,Y],P):-
     %%Calculando pongo en lado izquierdo
     calcula(Y,ValD,PDX),
     calcula(X,ValD,PDY),
-    min(PDX,PDI,PD),
-    min(PXI,PYI,PI),
-    min(PD,PI,P).
+    PD is min(PDX,PDI),
+    PI is min(PXI,PYI),
+    P is min(PD,PI).
 
 calcula(ValI,ValD,ValHeur):-
     empate(ValI,ValD), empato_dbw(ValHeur),!;
