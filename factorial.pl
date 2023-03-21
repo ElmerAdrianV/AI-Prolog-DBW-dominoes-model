@@ -13,3 +13,8 @@ factorial(N,Resp) :-
     ),
     Resp is N*Fact_n1,
     asserta(cons_factorial(N,Resp)).
+combinacion(N,K,Resp):-
+    factorial(N,Fn),
+    factorial(K,Fk),
+    factorial(N-K,Fnk),
+    Resp is Fn/(Fnk*Fk).
