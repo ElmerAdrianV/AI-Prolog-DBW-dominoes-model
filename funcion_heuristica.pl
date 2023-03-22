@@ -1,6 +1,7 @@
 carga_archivos:-
     [factorial],
     [domino_ed].
+
 funcion_heuristica(Ficha,ValHeur):-
     ( perdio_dbw ->
         perdio_dbw(ValHeur);
@@ -24,8 +25,8 @@ calcula_val_heur_mejor_mov([X,Y],P):-
     %%Calculando pongo en lado izquierdo
     calcula(Y,ValD,PDX),
     calcula(X,ValD,PDY),
-    PD is min(PDX,PDI),
-    PI is min(PXI,PYI),
+    PD is min(PDX,PDY),
+    PI is min(PXI,PYI ),
     P is min(PD,PI).
 
 calcula(ValI,ValD,ValHeur):-
@@ -48,11 +49,11 @@ calcula_probabilidad(Val,P):-
 calcula_num(_,Max,Max+1, []):-!.
 
 calcula_num(Val,Max,I, [X|Lista]):-
-    calcula_num(Max,I, X),
+    calcula_num(Val,I, X),
     NuevoI is I,
-    calcula_num(_,Max,NuevoI, Lista):-!.
+    calcula_num(Val,Max,NuevoI, Lista).
 
-calcula_num(Max, I, X):-
+calcula_num(Val, I, X):-
     cuenta(Val,Num_FV),
     num_fichas_op(Num_FOP),
     num_fichas_dbw(Num_FDBW),
