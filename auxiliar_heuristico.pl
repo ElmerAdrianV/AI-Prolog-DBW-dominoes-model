@@ -43,7 +43,7 @@ encontrar_fichas_posibles_dbw(Lista):-
 
 encontrar_fichas_posibles_dbw_izq_aux(X):-
     izquierdo(Izq),
-    tengo(X),
+    mano_dbw(X),
     ficha_contiene(Izq, X).
 
 encontrar_fichas_posibles_dbw_izq(Lista):-
@@ -51,7 +51,7 @@ encontrar_fichas_posibles_dbw_izq(Lista):-
 
 encontrar_fichas_posibles_dbw_der_aux(X):-
     derecho(Der),
-    tengo(X),
+    mano_dbw(X),
     ficha_contiene(Der, X).
 
 encontrar_fichas_posibles_dbw_der(Lista):-
@@ -61,8 +61,8 @@ encontrar_fichas_posibles_dbw_der(Lista):-
 encontrar_fichas_posibles_op_izq_aux(X):-
     izquierdo(Izq),
     fichas(X),
-    not(tengo(X)),
-    not(jugado(X)),
+    not(mano_dbw(X)),
+    not(tablero(X)),
     ficha_contiene(Izq, X).
 
 encontrar_fichas_posibles_op_izq(Lista):-
@@ -71,8 +71,8 @@ encontrar_fichas_posibles_op_izq(Lista):-
 encontrar_fichas_posibles_op_der_aux(X):-
     derecho(Der),
     fichas(X),
-    not(tengo(X)),
-    not(jugado(X)),
+    not(mano_dbw(X)),
+    not(tablero(X)),
     ficha_contiene(Der, X).
 
 encontrar_fichas_posibles_op_der(Lista):-
@@ -89,7 +89,7 @@ generar_estado_actual(State):-
     cuentaFichasPuntos(NumFichasPuntos),
     num_fichas_op(NumFichasOp),
     num_fichas_dbw(NumFichasDBW),
-    encontrar_fichas_posibles(ListaFichasPosibles),
+    encontrar_fichas_posibles_dbw(ListaFichasPosibles),
     generar_mano_dbw(ListaManoDBW),
     State = [
         ValD,
