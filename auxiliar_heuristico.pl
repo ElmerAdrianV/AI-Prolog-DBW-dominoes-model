@@ -5,7 +5,7 @@ carga_archivos:-
     [factorial],
     [funcion_heuristica],
     [domino_ed],
-    assertz(fichas([0,0])),
+    assertz(fichas([0,0])), 
     assertz(fichas([0,1])),
     assertz(fichas([0,2])),
     assertz(fichas([0,3])),
@@ -83,3 +83,36 @@ encontrar_fichas_posibles_op(Lista):-
     encontrar_fichas_posibles_op_izq(Lista1),
     encontrar_fichas_posibles_op_der(Lista2),
     union(Lista1, Lista2, Lista).
+
+generar_estado_actual(State):-
+    derecho(ValD),
+    izquierdo(ValI),
+    cuentaFichasPuntos(NumFichasPuntos),
+    num_fichas_op(NumFichasOp),
+    num_fichas_dbw(NumFichasDBW),
+    encontrar_fichas_posibles(ListaFichasPosibles),
+    generar_mano_dbw(ListaManoDBW),
+    State = [
+        ValD,
+        ValI,
+        NumFichasPuntos,
+        NumFichasOp,
+        NumFichasDBW,
+        ListaFichasPosibles,
+        ListaManoDBW
+    ].
+
+%%Necesitamos un replace nth element
+
+generar_mano_dbw(ListaManoDBW):-
+    findall(X, mano_dbw(X), ListaManoDBW).
+
+cuentaFichasPuntos(Lista):-
+    cuenta([0,Val0]),
+    cuenta([1,Val1]),
+    cuenta([2,Val2]),
+    cuenta([3,Val3]),
+    cuenta([4,Val4]),
+    cuenta([5,Val5]),
+    cuenta([6,Val6]),
+    Lista = [Val0,Val1,Val2,Val3,Val4,Val5,Val6].
