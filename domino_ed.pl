@@ -132,9 +132,11 @@ pon_primera_ficha(Ficha, Jugador) :-
   assertz(derecho(Val2)),
   assertz(izquierdo(Val1)),
   (Jugador == "DBW" -> 
-  retract(mano_dbw([Val1,Val2])); 
+  retract(mano_dbw([Val1,Val2])),
+  pone_ficha_dbw;
   retract(pozo([Val1,Val2])), 
-  actualiza_cuentas([Val1,Val2])), 
+  actualiza_cuentas([Val1,Val2]), 
+  pone_ficha_op),
   assertz(tablero([Val1,Val2])).
 
 juega_dbw(Ficha,"D") :-
