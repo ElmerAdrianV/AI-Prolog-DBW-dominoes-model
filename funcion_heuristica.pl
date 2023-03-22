@@ -1,6 +1,6 @@
 carga_archivos:-
     [factorial],
-    [domino_ed].
+    [auxiliar_heuristico].
 
 funcion_heuristica(State,Ficha,ValHeur):-
     nth0(0,State,ValD),
