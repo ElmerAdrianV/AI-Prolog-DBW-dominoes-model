@@ -2,7 +2,6 @@
     fichas/1.
 
 carga_archivos:-
-    [factorial],
     [funcion_heuristica],
     [domino_ed],
     assertz(fichas([0,0])), 
