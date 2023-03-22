@@ -8,8 +8,6 @@ funcion_heuristica(State,Ficha,ValHeur):-
     nth0(2,State,NumFichasPuntos),
     nth0(3,State,NumFichasOp),
     nth0(4,State,NumFichasDBW),
-    nth0(5,State,ListaFichasPosibles),
-    nth0(6,State,ListaManoDBW),
     ( perdio_dbw(NumFichasOp) ->
         perdio_dbw_val_heur(ValHeur);
         ( empate(ValI,ValD,NumFichasPuntos) ->
@@ -17,7 +15,7 @@ funcion_heuristica(State,Ficha,ValHeur):-
             ( puede_poner_dbw(ValI,ValD,Ficha) ->
                 ( puede_ganar_dbw(NumFichasDBW) ->
                     gano_dbw(ValHeur);
-                    calcula_val_heur_mejor_mov(Ficha,ValHeur)
+                    calcula_val_heur_mejor_mov(ValI,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,Ficha,ValHeur)
                 )
                 ;
                 no_puede_poner_dbw(ValHeur)
@@ -53,47 +51,42 @@ puede_ganar_dbw(NumFichasDBW):-
 ganar_dbw(ValHeur):-
     ValHeur is 0.
 
-calcula_val_heur_mejor_mov(ValI,ValD,NumFichasPuntos,[X,Y],P):-
+calcula_val_heur_mejor_mov(ValI,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,[X,Y],P):-
     %%Calculando pongo en lado derecho
-    calcula(ValI,Y,PXI),
-    calcula(ValI,X,PYI),
+    calcula(ValI,Y,NumFichasPuntos,NumFichasOp,NumFichasDBW,PXI),
+    calcula(ValI,X,NumFichasPuntos,NumFichasOp,NumFichasDBW,PYI),
     %%Calculando pongo en lado izquierdo
-    calcula(Y,ValD,PDX),
-    calcula(X,ValD,PDY),
+    calcula(Y,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,PDX),
+    calcula(X,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,PDY),
     PD is min(PDX,PDY),
     PI is min(PXI,PYI ),
     P is min(PD,PI).
 
-calcula(ValI,ValD,ValHeur):-
+calcula(ValI,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,ValHeur):-
     empate(ValI,ValD), empato_dbw(ValHeur),!;
-    calcula_probabilidad(ValI,PI),
-    calcula_probabilidad(ValI,PD),
+    calcula_probabilidad(ValI,NumFichasPuntos,NumFichasOp,NumFichasDBW,PI),
+    calcula_probabilidad(ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,PD),
     ValHeur is 50*(PI+PD).
 
-calcula_probabilidad(Val,P):-
-    cuenta(Val,Num_FV),
-    num_fichas_op(Num_FOP),
-    num_fichas_dbw(Num_FDBW),
-    max(Num_FV,Num_FOP,MaxDenI),
-    calcula_num(Val,MaxDenI,0, Nums),
+calcula_probabilidad(Val,NumFichasPuntos,NumFichasOp,NumFichasDBW,P):-
+    nth0(Val,NumFichasPuntos,NumFichaVal),
+    max(NumFichaVal,NumFichasOp,MaxNumI),
+    calcula_num(NumFichaVal,NumFichasOp,NumFichasDBW,MaxNumI,0, Nums),
     sum(Nums, SumNum),
-    Num_F is 28 - Num_FOP - Num_FDBW,
-    combinacion(Num_F, Num_FOP, Den),
+    NumFichas is 28 - NumFichasOp - NumFichasDBW,
+    combinacion(NumFichas, NumFichasOp, Den),
     P is SumNum / Den.
 
-calcula_num(_,Max,Max+1, []):-!.
+calcula_nums(_,_,_,Max,Max+1, []):-!.
 
-calcula_num(Val,Max,I, [X|Lista]):-
-    calcula_num(Val,I, X),
+calcula_nums(NumFichaVal,NumFichasOp,NumFichasDBW,Max,I, [X|Lista]):-
+    calcula_num(NumFichaVal,NumFichasOp,NumFichasDBW,I, X),
     NuevoI is I,
-    calcula_num(Val,Max,NuevoI, Lista).
+    calcula_nums(NumFichaVal,NumFichasOp,NumFichasDBW,Max,NuevoI, Lista).
 
-calcula_num(Val, I, X):-
-    cuenta(Val,Num_FV),
-    num_fichas_op(Num_FOP),
-    num_fichas_dbw(Num_FDBW),
-    combinaciones(Num_FV,I,Comb1),
-    Num_F is 28 - Num_FOP - Num_FDBW,
-    ResManoJ2 is Num_FOP - I,  
-    combinaciones(Num_F,ResManoJ2,Comb2),
+calcula_num(NumFichaVal,NumFichasOp,NumFichasDBW, I, X):-
+    combinaciones(NumFichaVal,I,Comb1),
+    NumFichas is 28 - NumFichasOp - NumFichasDBW,
+    ResManoJ2 is NumFichasOp - I,  
+    combinaciones(NumFichas,ResManoJ2,Comb2),
     X is Comb1*Comb2.
