@@ -1,6 +1,6 @@
 :- dynamic                                                                                                 
-	tengo/1, %Nos dice si tenemos cierta ficha                                                             
-	jugado/1, %Nos dice si una ficha está en el tablero 
+	mano_dbw/1, %Nos dice si tenemos cierta ficha                                                             
+	tablero/1, %Nos dice si una ficha está en el tablero 
 	oponente_tiene/1,                                                                                     
 	pozo/1, %Nos dice si una ficha está en el pozo (no vista)                                              
 	op_no_tiene/1, %Nos indica si un oponente no tiene un número                                           
@@ -11,8 +11,8 @@
 
 empieza_juego:-
   retractall(pozo(_)),
-  retractall(tengo(_)),
-  retractall(jugado(_)),
+  retractall(mano_dbw(_)),
+  retractall(tablero(_)),
   retractall(oponente_tiene(_)),
   retractall(op_no_tiene(_)),
   retractall(cuenta(_)),
@@ -94,7 +94,7 @@ la ficha que tomamos
 % Se debe registrar la ficha como [Menor|Mayor]
 tomo_ficha(Mano):-
   ordenar(Mano,FichaOrd),
-  assertz(tengo(FichaOrd)),
+  assertz(mano_dbw(FichaOrd)),
   retract(pozo(FichaOrd)),
   actualiza_cuentas(FichaOrd),
 
@@ -132,10 +132,10 @@ pon_primera_ficha(Ficha, Jugador) :-
   assertz(derecho(Val2)),
   assertz(izquierdo(Val1)),
   (Jugador == "DBW" -> 
-  retract(tengo([Val1,Val2])); 
+  retract(mano_dbw([Val1,Val2])); 
   retract(pozo([Val1,Val2])), 
   actualiza_cuentas([Val1,Val2])), 
-  assertz(jugado([Val1,Val2])).
+  assertz(tablero([Val1,Val2])).
 
 juega_dbw(Ficha,"D") :-
   ordenar(Ficha, [Val1, Val2]),
@@ -145,8 +145,8 @@ juega_dbw(Ficha,"D") :-
   assertz(derecho(Val1)) ; 
   assertz(derecho(Val2))),
 
-  retract(tengo([Val1,Val2])),
-  assertz(jugado([Val1,Val2])), 
+  retract(mano_dbw([Val1,Val2])),
+  assertz(tablero([Val1,Val2])), 
   
   pone_ficha_dbw.
 
@@ -158,8 +158,8 @@ juega_dbw(Ficha,"I") :-
   assertz(izquierdo(Val1)) ; 
   assertz(izquierdo(Val2)) ), 
 
-  retract(tengo([Val1,Val2])),
-  assertz(jugado([Val1,Val2])), 
+  retract(mano_dbw([Val1,Val2])),
+  assertz(tablero([Val1,Val2])), 
 
   pone_ficha_dbw.
 
@@ -171,7 +171,7 @@ juega_op(Ficha,"D") :-
   assertz(derecho(Val1)) ; 
   assertz(derecho(Val2))),
 
-  assertz(jugado([Val1,Val2])),
+  assertz(tablero([Val1,Val2])),
   retract(pozo([Val1,Val2])),
   actualiza_cuentas([Val1,Val2]), 
   
@@ -185,7 +185,7 @@ juega_op(Ficha,"I") :-
   assertz(izquierdo(Val1)) ; 
   assertz(izquierdo(Val2))),
 
-  assertz(jugado([Val1,Val2])),
+  assertz(tablero([Val1,Val2])),
   retract(pozo([Val1,Val2])),
   actualiza_cuentas([Val1,Val2]),
   
@@ -193,21 +193,21 @@ juega_op(Ficha,"I") :-
 
 
 imprime_mano(X) :-
-  tengo(X),write(X),nl,fail.
+  mano_dbw(X),write(X),nl,fail.
 imprime_tablero(X) :-
-  jugado(X),write(X),nl,fail.
+  tablero(X),write(X),nl,fail.
 
 ficha_contiene(Valor,[Valor,_|_]):- !.
 ficha_contiene(Valor,[_,Valor|_]):- !.
 
 movimientos_disponibles(X):-
   izquierdo(IZQ),
-  tengo(X),
+  mano_dbw(X),
   ficha_contiene(IZQ,X).
 
 movimientos_disponibles(X):-
   derecho(DER),
-  tengo(X),
+  mano_dbw(X),
   ficha_contiene(DER,X).
 
 /*
