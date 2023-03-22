@@ -2,13 +2,20 @@ carga_archivos:-
     [factorial],
     [domino_ed].
 
-funcion_heuristica(Ficha,ValHeur):-
-    ( perdio_dbw ->
-        perdio_dbw(ValHeur);
-        ( empate ->
+funcion_heuristica(State,Ficha,ValHeur):-
+    nth0(0,State,ValD),
+    nth0(1,State,ValI),
+    nth0(2,State,NumFichasPuntos),
+    nth0(3,State,NumFichasOp),
+    nth0(4,State,NumFichasDBW),
+    nth0(5,State,ListaFichasPosibles),
+    nth0(6,State,ListaManoDBW),
+    ( perdio_dbw(NumFichasOp) ->
+        perdio_dbw_val_heur(ValHeur);
+        ( empate(ValI,ValD,NumFichasPuntos) ->
             empato_dbw(ValHeur);
-            ( puede_poner_dbw(Ficha) ->
-                ( puede_ganar_dbw ->
+            ( puede_poner_dbw(ValI,ValD,Ficha) ->
+                ( puede_ganar_dbw(NumFichasDBW) ->
                     gano_dbw(ValHeur);
                     calcula_val_heur_mejor_mov(Ficha,ValHeur)
                 )
@@ -18,7 +25,35 @@ funcion_heuristica(Ficha,ValHeur):-
         )
     ).
 
-calcula_val_heur_mejor_mov([X,Y],P):-
+perdio_dbw(NumFichasOp):-
+    NumFichasOp=:=0.
+
+perdio_dbw_val_heur(ValHeur):-
+    ValHeur is 100000.
+
+empate(ValI,ValD,NumFichasPuntos):-
+    nth0(ValD,NumFichasPuntos,0),
+    nth0(ValI,NumFichasPuntos,0).
+
+empato_dbw(ValHeur):-
+    ValHeur is 10000.
+
+puede_poner_dbw(ValI,ValD,[X,Y]):-
+   X=:=ValI,!;
+   X=:=ValD,!;
+   Y=:=ValI,!;
+   Y=:=ValD,!.
+
+no_puede_poner_dbw(ValHeur):-
+    ValHeur is 1000.
+
+puede_ganar_dbw(NumFichasDBW):-
+    NumFichasDBW=:=1.
+
+ganar_dbw(ValHeur):-
+    ValHeur is 0.
+
+calcula_val_heur_mejor_mov(ValI,ValD,NumFichasPuntos,[X,Y],P):-
     %%Calculando pongo en lado derecho
     calcula(ValI,Y,PXI),
     calcula(ValI,X,PYI),
@@ -62,25 +97,3 @@ calcula_num(Val, I, X):-
     ResManoJ2 is Num_FOP - I,  
     combinaciones(Num_F,ResManoJ2,Comb2),
     X is Comb1*Comb2.
-
-puede_poner_dbw([X,Y]):-
-   derecho(X),!;
-   izquierdo(X),!;
-   derecho(Y),!;
-   izquierdo(Y),!.
-
-puede_ganar_dbw:-
-    num_fichas_dbw(1).
-
-perdio_dbw:-
-    num_fichas_op(0).
-
-empate:-
-    derecho(ValD), izquierdo(ValI),
-    cuenta([ValD, 0]),
-    cuenta([ValI, 0]).
-    
-empate(ValI,ValD):-
-    derecho(ValD), izquierdo(ValI),
-    cuenta([ValD, 0]),
-    cuenta([ValI, 0]).
