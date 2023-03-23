@@ -3,8 +3,8 @@ carga_archivos:-
     [auxiliar_heuristico].
 
 funcion_heuristica(State,Ficha,ValHeur):-
-    nth0(0,State,ValD),
-    nth0(1,State,ValI),
+    nth0(0,State,ValI),
+    nth0(1,State,ValD),
     nth0(2,State,NumFichasPuntos),
     nth0(3,State,NumFichasOp),
     nth0(4,State,NumFichasDBW),

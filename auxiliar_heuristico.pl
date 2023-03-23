@@ -92,8 +92,8 @@ generar_estado_actual(State):-
     encontrar_fichas_posibles_dbw(ListaFichasPosibles),
     generar_mano_dbw(ListaManoDBW),
     State = [
-        ValD,
         ValI,
+        ValD,
         NumFichasPuntos,
         NumFichasOp,
         NumFichasDBW,
