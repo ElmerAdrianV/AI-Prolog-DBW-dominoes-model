@@ -128,7 +128,9 @@ encontrar_fichas_posibles(ValI, ValD, [Ficha|Mano], [Ficha|Lista]):-
 
 
 encontrar_fichas_posibles(ValI, ValD, [Ficha|Mano], Lista):-
+    se_puede_poner_ficha(ValI,ValD,Ficha),!,
     encontrar_fichas_posibles_dbw(ValI, ValD, Mano, Lista).
+
 se_puede_poner_ficha(ValI,ValD, Ficha):-
     ficha_contiene(ValI, Ficha),!; 
     ficha_contiene(ValD, Ficha).
