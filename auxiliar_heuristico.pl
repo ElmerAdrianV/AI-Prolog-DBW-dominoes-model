@@ -127,7 +127,7 @@ encontrar_fichas_posibles(ValI, ValD, [Ficha|Mano], [Ficha|Lista]):-
     encontrar_fichas_posibles(ValI, ValD, Mano, Lista).
 
 
-encontrar_fichas_posibles(ValI, ValD, [Ficha|Mano], Lista):-
+encontrar_fichas_posibles(ValI, ValD, [_|Mano], Lista):-
     encontrar_fichas_posibles(ValI, ValD, Mano, Lista).
 
 
