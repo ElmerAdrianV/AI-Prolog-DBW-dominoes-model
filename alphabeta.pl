@@ -38,25 +38,28 @@ generar_estado_nuevo([Val1,Val2], State, Dir, Jugador, NewState):-
     nth0(2,State,NumFichasPuntos),
     nth0(3,State,NumFichasOp),
     nth0(4,State,NumFichasDBW),
+    %nth0(5,State,ListaFichasPosibles),
     nth0(6,State,ListaManoDBW),
     %%(length(ListaFichasPosibles) == 0 -> !),
 
 
     (Dir == "D" -> 
-        (Val1 == ValD -> 
-            NewValD is Val2, NewValI is ValI ; NewValD is Val1, NewValI is ValI), 
-        (Jugador \== "DBW" ->
-            nth0(NewValD,NumFichasPuntos,ValDNumFichas), NewValDNumFichas is ValDNumFichas - 1, replace(ValD,NumFichasPuntos,NewValDNumFichas,NewNumFichasPuntos))
+    (Val1 == ValD -> 
+        NewValD is Val2, NewValI is ValI ; NewValD is Val1, NewValI is ValI) 
     ; (Val1 == ValI ->
-            NewValI is Val2, NewValD is ValD; NewValI is Val1, NewValD is ValD),  
-        (Jugador \== "DBW" ->
-            nth0(NewValI,NumFichasPuntos,ValINumFichas), NewValINumFichas is ValINumFichas - 1, replace(ValI,NumFichasPuntos,NewValINumFichas,NewNumFichasPuntos))),
+        NewValI is Val2, NewValD is ValD; NewValI is Val1, NewValD is ValD)),
     
+
+
     (Jugador == "DBW" -> 
         delete(ListaManoDBW, [Val1,Val2], NewListaManoDBW),
         encontrar_fichas_posibles(NewValI, NewValD, NewListaManoDBW, NewListaFichasPosibles), 
-        NewNumFichasDBW is NumFichasDBW - 1
+        NewNumFichasDBW is NumFichasDBW - 1, 
+        NewNumFichasOp is NumFichasOp, 
+        NewNumFichasPuntos = NumFichasPuntos
         ; 
+        nth0(Val1,NumFichasPuntos,Val1NumFichas), NewVal1NumFichas is Val1NumFichas - 1, replace(Val1,NumFichasPuntos,NewVal1NumFichas,NewNumFichasPuntos), 
+        nth0(Val2,NumFichasPuntos,Val2NumFichas), NewVal2NumFichas is Val2NumFichas - 1, replace(Val2,NumFichasPuntos,NewVal2NumFichas,NewNumFichasPuntos),
         NewNumFichasOp is NumFichasOp - 1),
     
     NewState = [
@@ -67,7 +70,9 @@ generar_estado_nuevo([Val1,Val2], State, Dir, Jugador, NewState):-
         NewNumFichasDBW,
         NewListaFichasPosibles,
         NewListaManoDBW
-    ].
+    ],
+    write(NewValI), nl,  write(NewValD), nl, write(NewNumFichasPuntos), nl,  write(NewNumFichasOp), nl,
+    write(NewNumFichasDBW), nl,  write(NewListaFichasPosibles), nl,  write(NewListaManoDBW), nl.
 
 poda_alphabeta(State,ListaFichasPosibles,Depth):-
     NewDepth is Depth - 1,
