@@ -17,12 +17,20 @@ alphabeta(State,Depth,FichaAJugar):-
     nth0(1,State,ValD),
     nth0(7,State,ManoDBW),
     encontrar_fichas_posibles(ValI, ValD, ManoDBW,ListaFichasPosibles),
-    poda_alphabeta(State,ListaFichasPosibles,Depth, 1),
-    alpha(_,FichaAJugar),
-    retractall(alpha),
-    retractall(beta).
+    %% hacer una lista que guarde la ficha y el valor heuristico que regresa para cada una
 
-poda_alphabeta(State,ListaFichasPosibles,Depth, 1):-!.
+
+%%Player 1 = DBW
+%%Player 0 = OP
+
+%% necesitamos un dada una ficha genera un nuevo estado
+
+poda_alphabeta(State,ListaFichasPosibles,Depth):-
+    NewDepth is Depth - 1,
+    poda_alphabeta(State,ListaFichasPosibles,NewDepth, 0),
+    .
+poda_alphabeta(State,ListaFichasPosibles,Depth, 0):-
+    poda_alphabeta(State,ListaFichasPosibles,Depth, 1):-
 
 finish_search(Depth,State):-
     Depth=:=0,!;
