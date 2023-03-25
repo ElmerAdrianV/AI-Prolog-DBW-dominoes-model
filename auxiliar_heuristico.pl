@@ -124,12 +124,12 @@ encontrar_fichas_posibles(_, _,[], []):-!.
 
 encontrar_fichas_posibles(ValI, ValD, [Ficha|Mano], [Ficha|Lista]):-
     se_puede_poner_ficha(ValI,ValD, Ficha),!,
-    encontrar_fichas_posibles_dbw(ValI, ValD, Mano, Lista).
+    encontrar_fichas_posibles(ValI, ValD, Mano, Lista).
 
 
 encontrar_fichas_posibles(ValI, ValD, [Ficha|Mano], Lista):-
-    se_puede_poner_ficha(ValI,ValD,Ficha),!,
-    encontrar_fichas_posibles_dbw(ValI, ValD, Mano, Lista).
+    encontrar_fichas_posibles(ValI, ValD, Mano, Lista).
+
 
 se_puede_poner_ficha(ValI,ValD, Ficha):-
     ficha_contiene(ValI, Ficha),!; 
