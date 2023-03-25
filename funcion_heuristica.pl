@@ -2,24 +2,21 @@ carga_archivos:-
     [factorial],
     [auxiliar_heuristico].
 
-funcion_heuristica(State,Ficha,ValHeur):-
+funcion_heuristica(State,ValHeur):-
     nth0(0,State,ValI),
     nth0(1,State,ValD),
     nth0(2,State,NumFichasPuntos),
     nth0(3,State,NumFichasOp),
     nth0(4,State,NumFichasDBW),
+    nth0(7,State,NumFichasTab),
     ( perdio_dbw(NumFichasOp) ->
         perdio_dbw_val_heur(ValHeur);
         ( empate(ValI,ValD,NumFichasPuntos) ->
             empato_dbw(ValHeur);
-            ( puede_poner_dbw(ValI,ValD,Ficha) ->
                 ( puede_ganar_dbw(NumFichasDBW) ->
                     gano_dbw(ValHeur);
-                    calcula_val_heur_mejor_mov(ValI,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,Ficha,ValHeur)
+                    calcula_val_heur_mejor_mov(ValI,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,NumFichasTab,ValHeur)
                 )
-                ;
-                no_puede_poner_dbw(ValHeur)
-            )
         )
     ).
 
@@ -36,57 +33,48 @@ empate(ValI,ValD,NumFichasPuntos):-
 empato_dbw(ValHeur):-
     ValHeur is 10000.
 
-puede_poner_dbw(ValI,ValD,[X,Y]):-
-   X=:=ValI,!;
-   X=:=ValD,!;
-   Y=:=ValI,!;
-   Y=:=ValD,!.
-
 no_puede_poner_dbw(ValHeur):-
     ValHeur is 1000.
 
 puede_ganar_dbw(NumFichasDBW):-
-    NumFichasDBW=:=1.
+    NumFichasDBW=:=0.
 
 ganar_dbw(ValHeur):-
     ValHeur is 0.
 
-calcula_val_heur_mejor_mov(ValI,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,[X,Y],P):-
+calcula_val_heur_mejor_mov(ValI,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,NumFichasTab,P):-
     %%Calculando pongo en lado derecho
-    calcula(ValI,Y,NumFichasPuntos,NumFichasOp,NumFichasDBW,PXI),
-    calcula(ValI,X,NumFichasPuntos,NumFichasOp,NumFichasDBW,PYI),
-    %%Calculando pongo en lado izquierdo
-    calcula(Y,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,PDX),
-    calcula(X,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,PDY),
-    PD is min(PDX,PDY),
-    PI is min(PXI,PYI ),
-    P is min(PD,PI).
+    calcula(ValI,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,NumFichasTab,P).
 
-calcula(ValI,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,ValHeur):-
-    empate(ValI,ValD), empato_dbw(ValHeur),!;
-    calcula_probabilidad(ValI,NumFichasPuntos,NumFichasOp,NumFichasDBW,PI),
-    calcula_probabilidad(ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,PD),
-    ValHeur is 50*(PI+PD).
+calcula(ValI,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,NumFichasTab,ValHeur):-
+    calcula_probabilidad(ValI,NumFichasPuntos,NumFichasOp,NumFichasDBW,NumFichasTab,PI),
+    calcula_probabilidad(ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,NumFichasTab,PD),
+    ValHeur is max(PI,PD).
 
-calcula_probabilidad(Val,NumFichasPuntos,NumFichasOp,NumFichasDBW,P):-
+calcula_probabilidad(Val,NumFichasPuntos,NumFichasOp,NumFichasDBW,NumFichasTab,P):-
     nth0(Val,NumFichasPuntos,NumFichaVal),
-    max(NumFichaVal,NumFichasOp,MaxNumI),
-    calcula_num(NumFichaVal,NumFichasOp,NumFichasDBW,MaxNumI,0, Nums),
-    sum(Nums, SumNum),
-    NumFichas is 28 - NumFichasOp - NumFichasDBW,
-    combinacion(NumFichas, NumFichasOp, Den),
+    MinNumI is min(NumFichaVal,NumFichasOp),
+    NumFichas is 28 - NumFichasTab - NumFichasDBW,
+    ResNumFichas is NumFichas - NumFichaVal,
+    calcula_nums(NumFichaVal,NumFichasOp,ResNumFichas,MinNumI,1, Nums),
+    sumlist(Nums, SumNum),
+    combinaciones(NumFichas, NumFichasOp, Den),
     P is SumNum / Den.
 
-calcula_nums(_,_,_,Max,Max+1, []):-!.
 
-calcula_nums(NumFichaVal,NumFichasOp,NumFichasDBW,Max,I, [X|Lista]):-
-    calcula_num(NumFichaVal,NumFichasOp,NumFichasDBW,I, X),
-    NuevoI is I,
-    calcula_nums(NumFichaVal,NumFichasOp,NumFichasDBW,Max,NuevoI, Lista).
 
-calcula_num(NumFichaVal,NumFichasOp,NumFichasDBW, I, X):-
+calcula_nums(NumFichaVal,NumFichasOp,ResNumFichas,Min,I, [X|Lista]):-
+    (Min + 1 =:= I ->
+        X is 0,
+        Lista = [];
+        calcula_num(NumFichaVal,NumFichasOp,ResNumFichas,I, X),
+        NuevoI is I+1,
+        calcula_nums(NumFichaVal,NumFichasOp,ResNumFichas,Min,NuevoI, Lista)
+    ).
+    
+
+calcula_num(NumFichaVal,NumFichasOp,ResNumFichas, I, X):-
     combinaciones(NumFichaVal,I,Comb1),
-    NumFichas is 28 - NumFichasOp - NumFichasDBW,
     ResManoJ2 is NumFichasOp - I,  
-    combinaciones(NumFichas,ResManoJ2,Comb2),
+    combinaciones(ResNumFichas,ResManoJ2,Comb2),
     X is Comb1*Comb2.
