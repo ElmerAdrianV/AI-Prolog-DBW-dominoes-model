@@ -3,6 +3,7 @@
 
 carga_archivos:-
     [funcion_heuristica],
+    [factorial],
     [domino_ed],
     assertz(fichas([0,0])), 
     assertz(fichas([0,1])),
@@ -89,6 +90,7 @@ generar_estado_actual(State):-
     cuentaFichasPuntos(NumFichasPuntos),
     num_fichas_op(NumFichasOp),
     num_fichas_dbw(NumFichasDBW),
+    cuenta_fichas_tablero(NumFichasTab),
     encontrar_fichas_posibles_dbw(ListaFichasPosibles),
     generar_mano_dbw(ListaManoDBW),
     State = [
@@ -98,7 +100,8 @@ generar_estado_actual(State):-
         NumFichasOp,
         NumFichasDBW,
         ListaFichasPosibles,
-        ListaManoDBW
+        ListaManoDBW,
+        NumFichasTab
     ].
 
 %%Necesitamos un replace nth element
@@ -127,6 +130,10 @@ encontrar_fichas_posibles(ValI, ValD, [Ficha|Mano], [Ficha|Lista]):-
 encontrar_fichas_posibles(ValI, ValD, [Ficha|Mano], Lista):-
     encontrar_fichas_posibles(ValI, ValD, Mano, Lista).
 
+
 se_puede_poner_ficha(ValI,ValD, Ficha):-
     ficha_contiene(ValI, Ficha),!; 
     ficha_contiene(ValD, Ficha).
+
+cuenta_fichas_tablero(NumFichasTab):-
+    findall(X, tablero(X), Lista),length(Lista,NumFichasTab).

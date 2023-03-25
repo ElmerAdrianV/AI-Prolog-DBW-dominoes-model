@@ -13,7 +13,7 @@ factorial(N,Resp) :-
     ),
     Resp is N*Fact_n1,
     asserta(cons_factorial(N,Resp)).
-combinacion(N,K,Resp):-
+combinaciones(N,K,Resp):-
     factorial(N,Fn),
     factorial(K,Fk),
     DifNK is N-K,
