@@ -8,10 +8,13 @@ carga_archivos_ab:-
     [domino_ed],
     [auxiliar_heuristico].
 
+%%Player 1 = DBW
+%%Player 0 = OP
+
 alphabeta(State,Depth,ValHeur):-
     alpha(-100000000),
     beta(100000000),
-    poda_alphabeta(State,Depth,1,ValHeur).
+    poda_alphabeta(State,Depth,0,ValHeur).
 
 %%caso de profundidad 0
 poda_alphabeta(State,0,1,ValHeur):-
@@ -90,8 +93,7 @@ itera_estados_min([State|Resto],Depth,Player):-
         true;
         itera_estados_min(Resto,Depth,Player)
     ).
-%%Player 1 = DBW
-%%Player 0 = OP
+
 se_puede_poner_en_ambos_lados(ValI,ValD,[Val1,Val2]):-
     (Val1 == ValD, Val2 == ValI),!;
     (Val1 == ValI, Val2 == ValD).
