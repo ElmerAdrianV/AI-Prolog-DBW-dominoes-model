@@ -174,3 +174,22 @@ generar_estado_nuevo([Val1,Val2], State, Dir, Jugador, NewState):-
         NewListaPozo,
         NewNumFichasTab
     ].
+
+%% State i, Ficha o, Lado o
+dame_mejor_ficha(State,Ficha,Lado):-
+    nth0(0,State,ValI),
+    nth0(1,State,ValD),
+    nth0(5,State,ListaFichasPosibles), 
+    regresar_estado_fichas_posibles(State, ListaFichasPosibles, ValI, ValD, ListaEstadosFichaLado),
+    regresar_valor_heuristico_cada_estado(ListaEstadosFichaLado, ListaEstadosFichaLadoAlfaBeta).
+
+regresar_estado_fichas_posibles(_, [], _, _, []):- !.
+
+
+regresar_estado_fichas_posibles(State, [[Val1,Val2]|FichasPosibles], ValI, ValD, [[NewState, Lado, [Val1,Val2]]|ListaEstadosFichaLado]):-
+    (Val1 == ValD -> Lado = "D" ; (Val2 == ValD -> Lado = "D" ; Lado = "I") ; Lado = "I"), 
+    generar_estado_nuevo([Val1,Val2], State, Lado, "DBW", NewState), 
+    regresar_estado_fichas_posibles(State, FichasPosibles, ValI,ValD, ListaEstadosFichaLado).
+
+regresar_valor_heuristico_cada_estado([[State, Ficha, Lado]|ListaEstadosFichaLado], [[Valor,Ficha,Lado]|Lista]):- 
+    alphabeta(State, 5, FichaAJugar).
