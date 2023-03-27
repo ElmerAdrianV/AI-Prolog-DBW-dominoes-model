@@ -12,8 +12,8 @@ carga_archivos_ab:-
 %%Player 0 = OP
 
 alphabeta(State,Depth,ValHeur):-
-    alpha(-100000000),
-    beta(100000000),
+    asserta(alpha(-100000000)),
+    asserta(beta(100000000)),
     poda_alphabeta(State,Depth,0,ValHeur).
 
 %%caso de profundidad 0

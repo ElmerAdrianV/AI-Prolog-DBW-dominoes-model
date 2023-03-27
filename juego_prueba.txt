@@ -7,4 +7,4 @@ generar_estado_nuevo([1,2], [0,1,[5,5,5,6,5,6,3],6,5,[[0,0],[1,2]],[[1,2],[0,0],
 
 carga_archivos_ab,State = [2,5,[2,3,3,2,5,5],3,2,[[1,5],[2,3]],[[1,5],[2,3]],5],
 FichasPosibles = [[1,5],[2,3]],
-genera_estados_posibles(State,"DBW",FichasPosibles, NuevosEstados),write_estados(NuevosEstados).
+genera_estados_posibles(State,"OP",FichasPosibles, NuevosEstados),write_estados(NuevosEstados).
