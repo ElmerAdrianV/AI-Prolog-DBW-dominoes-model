@@ -215,7 +215,7 @@ regresar_valor_heuristico_cada_estado([[State, Ficha, Lado]|ListaEstadosFichaLad
 
 regresar_maximo_valor_ficha([], _):- !.
 
-regresar_maximo_valor_ficha([[ValorMax,Ficha,Lado]|_], ValorMax):-
+regresar_maximo_valor_ficha([[ValorMax,Lado,Ficha]|_], ValorMax):-
     write("Ficha = "),write( Ficha),write( ", lado = "), write(Lado),write( ", Val = "), write(ValorMax),! .
 regresar_maximo_valor_ficha([_|ListaEstadosFichaLadoAlfaBeta], ValorMax):-
     regresar_maximo_valor_ficha(ListaEstadosFichaLadoAlfaBeta, ValorMax).
