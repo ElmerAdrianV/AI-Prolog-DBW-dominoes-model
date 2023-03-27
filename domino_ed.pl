@@ -1,9 +1,7 @@
 :- dynamic                                                                                                 
 	mano_dbw/1, %Nos dice si tenemos cierta ficha                                                             
 	tablero/1, %Nos dice si una ficha está en el tablero 
-	oponente_tiene/1,                                                                                     
 	pozo/1, %Nos dice si una ficha está en el pozo (no vista)                                              
-	op_no_tiene/1, %Nos indica si un oponente no tiene un número                                           
 	derecho/1, %Nos indica el número abierto en el extremo derecho                                         
 	izquierdo/1, %Nos indica el número abierto en el extremo izquierdo
   num_fichas_dbw/1, %Numero de fichas que tenemos 
@@ -212,10 +210,3 @@ movimientos_disponibles(X):-
   mano_dbw(X),
   ficha_contiene(DER,X).
 
-/*
-Evalua, dado las fichas en mano, en el pozo, 
-y lo que sabemos de la mano del jugador, el valor
-heurístico del estado. 
-*/
-evalua_estado:-
-!.

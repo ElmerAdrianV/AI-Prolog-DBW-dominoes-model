@@ -210,7 +210,7 @@ regresar_estado_fichas_posibles(State, [[Val1,Val2]|FichasPosibles], ValI, ValD,
 regresar_valor_heuristico_cada_estado([],[], []):-!.
 
 regresar_valor_heuristico_cada_estado([[State, Ficha, Lado]|ListaEstadosFichaLado], [[Valor,Ficha,Lado]|Lista], [Valor|ListaValores]):- 
-    alphabeta(State, 7, Valor),
+    alphabeta(State, 13, Valor),
     regresar_valor_heuristico_cada_estado(ListaEstadosFichaLado,Lista, ListaValores).
 
 regresar_maximo_valor_ficha([], _):- !.

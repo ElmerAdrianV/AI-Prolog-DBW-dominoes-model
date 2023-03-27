@@ -40,7 +40,7 @@ puede_ganar_dbw(NumFichasDBW):-
     NumFichasDBW=:=0.
 
 ganar_dbw(ValHeur):-
-    ValHeur is 0.
+    ValHeur is 1000.
 
 calcula_val_heur_mejor_mov(ValI,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,NumFichasTab,ValHeur):-
     %%Calculando pongo en lado derecho
@@ -61,8 +61,6 @@ calcula_probabilidad(Val,NumFichasPuntos,NumFichasOp,NumFichasDBW,NumFichasTab,P
     sumlist(Nums, SumNum),
     combinaciones(NumFichas, NumFichasOp, Den),
     P is SumNum / Den.
-
-
 
 calcula_nums(NumFichaVal,NumFichasOp,ResNumFichas,Min,I, [X|Lista]):-
     (Min + 1 =:= I ->
