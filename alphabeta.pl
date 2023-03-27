@@ -46,7 +46,7 @@ poda_alphabeta(State,_,_,1,ValHeur):-
 poda_alphabeta(State,_,_,_,ValHeur):-
     nth0(4,State,NumFichasDBW),
     puede_ganar_dbw(NumFichasDBW),
-    gano_dbw(ValHeur),!.
+    ganar_dbw(ValHeur),!.
 
 %%perdio dbw
 poda_alphabeta(State,_,_,_,ValHeur):-
@@ -189,7 +189,8 @@ generar_estado_nuevo([Val1,Val2], State, Dir, Jugador, NewState):-
     ].
 
 %% State i, Ficha o, Lado o
-dame_mejor_ficha(State):-
+dame_mejor_ficha:-
+    generar_estado_actual(State),
     nth0(0,State,ValI),
     nth0(1,State,ValD),
     nth0(5,State,ListaFichasPosibles), 
@@ -209,7 +210,7 @@ regresar_estado_fichas_posibles(State, [[Val1,Val2]|FichasPosibles], ValI, ValD,
 regresar_valor_heuristico_cada_estado([],[], []):-!.
 
 regresar_valor_heuristico_cada_estado([[State, Ficha, Lado]|ListaEstadosFichaLado], [[Valor,Ficha,Lado]|Lista], [Valor|ListaValores]):- 
-    alphabeta(State, 5, Valor),
+    alphabeta(State, 7, Valor),
     regresar_valor_heuristico_cada_estado(ListaEstadosFichaLado,Lista, ListaValores).
 
 regresar_maximo_valor_ficha([], _):- !.

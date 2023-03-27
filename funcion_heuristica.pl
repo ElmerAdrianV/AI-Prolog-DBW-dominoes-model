@@ -14,7 +14,7 @@ funcion_heuristica(State,ValHeur):-
         ( empate(ValI,ValD,NumFichasPuntos) ->
             empato_dbw(ValHeur);
                 ( puede_ganar_dbw(NumFichasDBW) ->
-                    gano_dbw(ValHeur);
+                    ganar_dbw(ValHeur);
                     calcula_val_heur_mejor_mov(ValI,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,NumFichasTab,ValHeur)
                 )
         )
