@@ -106,6 +106,27 @@ generar_estado_actual(State):-
         NumFichasTab
     ].
 
+generar_estado_actual_op(State):-
+    derecho(ValD),
+    izquierdo(ValI),
+    cuentaFichasPuntos(NumFichasPuntos),
+    num_fichas_op(NumFichasOp),
+    num_fichas_dbw(NumFichasDBW),
+    cuenta_fichas_tablero(NumFichasTab),
+    generar_mano_dbw(ListaManoDBW),
+    generar_pozo(ListaPozo),
+    encontrar_fichas_posibles(ValI, ValD, ListaPozo, ListaFichasPosibles),
+    State = [
+        ValI,
+        ValD,
+        NumFichasPuntos,
+        NumFichasOp,
+        NumFichasDBW,
+        ListaFichasPosibles,
+        ListaManoDBW,
+        ListaPozo,
+        NumFichasTab
+    ].
 %%Necesitamos un replace nth element
 
 generar_pozo(ListaPozo):-

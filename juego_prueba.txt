@@ -1,10 +1,32 @@
-empieza_juego,mano_inicial([[1,2],[0,0],[6,6],[4,5],[2,3],[4,6],[0,6]]).
-pon_primera_ficha([6,6],"DBW"),juega_op([6,1],"D").
-juega_dbw([6,0],"I").
-funcion_heuristica([0,1,[5,5,5,6,5,6,3],6,5,[[0,0],[1,2]],[[1,2],[0,0],[4,5],[2,3],[4,6]],3],Val).
+carga_archivos_ab.
+empieza_juego,mano_inicial([[1,2],[0,0],[6,6],[4,5],[2,3],[4,6],[0,6]]),!,pon_primera_ficha([6,6],"DBW"),juega_op([6,1],"D"),!,juega_dbw([6,0],"I").
+generar_estado_actual_op(State),alphabeta(State,3,ValHeur).
+
+, nth0(5,State,FichasPosibles),
+generar_estado_actual_op(State),nth0(5,State,FichasPosibles),genera_estados_posibles(State,"OP",FichasPosibles, NuevosEstados),write_estados(NuevosEstados).
+
+funcion_heuristica([0,1,[5,5,5,6,5,6,3],6,5,[[0,0],[1,2]],[[1,2],[0,0],[4,5],[2,3],[4,6]],[],3],Val).
 generar_estado_nuevo([1,2], [0,1,[5,5,5,6,5,6,3],6,5,[[0,0],[1,2]],[[1,2],[0,0],[4,5],[2,3],[4,6]],3], "D", "DBW", NewState).
 
 
-carga_archivos_ab,State = [2,5,[2,3,3,2,5,5],3,2,[[1,5],[2,3]],[[1,5],[2,3]],5],
-FichasPosibles = [[1,5],[2,3]],
-genera_estados_posibles(State,"DBW",FichasPosibles, NuevosEstados),write_estados(NuevosEstados).
+carga_archivos_ab,State = [
+    2,
+    5,
+    [2,3,3,2,1,5],
+    1,
+    2,
+    [[2,3],[2,4],[0,2],[3,5]],
+    [[1,5],[2,3]],
+    [[2,3],[2,4],
+    [0,2],[3,5]],
+    21],
+FichasPosibles = [[2,3],[2,4],[0,2],[3,5]],
+genera_estados_posibles(State,"OP",FichasPosibles, NuevosEstados),write_estados(NuevosEstados).
+
+State=[0,1,[5,5,5,6,5,6,3],
+    6,5,
+    [[0,1],[0,2],[0,3],[0,4],[0,5],[1,1],[1,3],[1,4],[1,5]],
+    [[1,2],[0,0],[4,5],[2,3],[4,6]],
+    [[0,1],[0,2],[0,3],[0,4],[0,5],[1,1],[1,3],[1,4],[1,5],[2,2],[2,4],[2,5],[2,6],[3,3],[3,4],[3,5],[3,6],[4,4],[5,5],[5,6]],
+    3
+],nth0(5,State,FichasPosibles),genera_estados_posibles(State,"OP",FichasPosibles, NuevosEstados),write_estados(NuevosEstados).
