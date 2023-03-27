@@ -8,7 +8,7 @@ funcion_heuristica(State,ValHeur):-
     nth0(2,State,NumFichasPuntos),
     nth0(3,State,NumFichasOp),
     nth0(4,State,NumFichasDBW),
-    nth0(7,State,NumFichasTab),
+    nth0(8,State,NumFichasTab),
     ( perdio_dbw(NumFichasOp) ->
         perdio_dbw_val_heur(ValHeur);
         ( empate(ValI,ValD,NumFichasPuntos) ->

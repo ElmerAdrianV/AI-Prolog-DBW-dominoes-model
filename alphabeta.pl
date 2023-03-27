@@ -20,32 +20,32 @@ poda_alphabeta(State,0,1,ValHeur):-
 %% casos de nodo terminal
 
 %% no puede poner DBW
-poda_alphabeta(State,Depth,1,ValHeur):-
+poda_alphabeta(State,_,1,ValHeur):-
     nth(5, State, ListaFichasPosibles),
     length(ListaFichasPosibles,0),
     no_puede_poner_dbw(ValHeur),!.
 
 %% no puede poner OP
-poda_alphabeta(State,Depth,0,ValHeur):-
+poda_alphabeta(State,_,0,ValHeur):-
     nth(5, State, ListaFichasPosibles),
     length(ListaFichasPosibles,0),
     ValHeur is 0,!.
 
 %%empate
-poda_alphabeta(State,Depth,1,ValHeur):-
+poda_alphabeta(State,_,1,ValHeur):-
     nth0(0,State,ValI),
     nth0(1,State,ValD),
     nth0(2,State,NumFichasPuntos),
     empate(ValI,ValD,NumFichasPuntos),
     empato_dbw(ValHeur),!.
 %%gano dbw 
-poda_alphabeta(State,Depth,_,ValHeur):-
+poda_alphabeta(State,_,_,ValHeur):-
     nth0(4,State,NumFichasDBW),
     puede_ganar_dbw(NumFichasDBW),
     gano_dbw(ValHeur),!.
 
 %%perdio dbw
-poda_alphabeta(State,Depth,_,ValHeur):-
+poda_alphabeta(State,_,_,ValHeur):-
     nth0(3,State,NumFichasOp),
     perdio_dbw(NumFichasOp),
     perdio_dbw_val_heur(ValHeur),!.
@@ -107,11 +107,19 @@ genera_estados_posibles(State,Jugador,[Ficha|FichasPosibles], [NuevoEstado1,Nuev
     genera_estados_posibles(State,Jugador,FichasPosibles, ListaEstados).
 
 genera_estados_posibles(State,Jugador,[[Val1,Val2]|FichasPosibles], [NuevoEstado|ListaEstados]):-
-    nth0(0,State,ValI),
     nth0(1,State,ValD),
     (Val1 == ValD ; Val2 == ValD -> Lado = "D" ; Lado = "I"),!, 
     generar_estado_nuevo([Val1,Val2], State, Lado, Jugador, NuevoEstado),
     genera_estados_posibles(State,Jugador,FichasPosibles, ListaEstados).
+
+write_estados([]):-!.
+write_estados([Estado|Resto]):-
+    write_estado(Estado),
+    write_estados(Resto).
+write_estado([ValI,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,ListaFichasPosibles,ListaManoDBW]):-
+    write("Estado"),nl,
+    write(ValI), nl,  write(ValD), nl, write(NumFichasPuntos), nl,  write(NumFichasOp), nl,
+    write(NumFichasDBW), nl,  write(ListaFichasPosibles), nl,  write(ListaManoDBW), nl.
 
 
 %%Player 1 = DBW
@@ -129,7 +137,9 @@ generar_estado_nuevo([Val1,Val2], State, Dir, Jugador, NewState):-
     nth0(3,State,NumFichasOp),
     nth0(4,State,NumFichasDBW),
     nth0(6,State,ListaManoDBW),
-
+    nth0(7,State,ListaPozo),
+    nth0(8,State,NumFichasTab),
+   
     (Dir == "D" -> 
     (Val1 == ValD -> 
         NewValD is Val2, NewValI is ValI ; NewValD is Val1, NewValI is ValI) 
@@ -138,20 +148,29 @@ generar_estado_nuevo([Val1,Val2], State, Dir, Jugador, NewState):-
     
     (Jugador == "DBW" -> 
         delete(ListaManoDBW, [Val1,Val2], NewListaManoDBW),
-        encontrar_fichas_posibles(NewValI, NewValD, NewListaManoDBW, NewListaFichasPosibles), 
+        NewListaPozo = ListaPozo,
+        encontrar_fichas_posibles(NewValI, NewValD, NewListaPozo, NewListaFichasPosibles),
         NewNumFichasDBW is NumFichasDBW - 1, 
         NewNumFichasOp is NumFichasOp, 
         NewNumFichasPuntos = NumFichasPuntos
-        ; 
+        ;
+        delete(ListaPozo, [Val1,Val2], NewListaPozo), 
+        NewListaManoDBW = ListaManoDBW,
+        encontrar_fichas_posibles(NewValI, NewValD, NewListaManoDBW, NewListaFichasPosibles), 
         nth0(Val1,NumFichasPuntos,Val1NumFichas), NewVal1NumFichas is Val1NumFichas - 1, replace(Val1,NumFichasPuntos,NewVal1NumFichas,NewNumFichasPuntos), 
-        nth0(Val2,NumFichasPuntos,Val2NumFichas), NewVal2NumFichas is Val2NumFichas - 1, replace(Val2,NumFichasPuntos,NewVal2NumFichas,NewNumFichasPuntos),
-        NewNumFichasOp is NumFichasOp - 1),
+        nth0(Val2,NumFichasPuntos,Val2NumFichas), NewVal2NumFichas is Val2NumFichas - 1, replace(Val2,NewNumFichasPuntos,NewVal2NumFichas,NewFinalNumFichasPuntos),
+        NewNumFichasOp is NumFichasOp - 1,
+        NewNumFichasDBW = NumFichasDBW),
+    
+    NewNumFichasTab = NumFichasTab + 1,
     NewState = [
         NewValI, 
         NewValD, 
-        NewNumFichasPuntos,
+        NewFinalNumFichasPuntos,
         NewNumFichasOp, 
         NewNumFichasDBW,
         NewListaFichasPosibles,
-        NewListaManoDBW
+        NewListaManoDBW,
+        NewListaPozo,
+        NewNumFichasTab
     ].
