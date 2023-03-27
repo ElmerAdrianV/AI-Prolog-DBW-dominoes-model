@@ -8,7 +8,7 @@ funcion_heuristica(State,ValHeur):-
     nth0(2,State,NumFichasPuntos),
     nth0(3,State,NumFichasOp),
     nth0(4,State,NumFichasDBW),
-    nth0(7,State,NumFichasTab),
+    nth0(8,State,NumFichasTab),
     ( perdio_dbw(NumFichasOp) ->
         perdio_dbw_val_heur(ValHeur);
         ( empate(ValI,ValD,NumFichasPuntos) ->
@@ -24,17 +24,17 @@ perdio_dbw(NumFichasOp):-
     NumFichasOp=:=0.
 
 perdio_dbw_val_heur(ValHeur):-
-    ValHeur is 100000.
+    ValHeur is -100000.
 
 empate(ValI,ValD,NumFichasPuntos):-
     nth0(ValD,NumFichasPuntos,0),
     nth0(ValI,NumFichasPuntos,0).
 
 empato_dbw(ValHeur):-
-    ValHeur is 10000.
+    ValHeur is -10000.
 
 no_puede_poner_dbw(ValHeur):-
-    ValHeur is 1000.
+    ValHeur is -1000.
 
 puede_ganar_dbw(NumFichasDBW):-
     NumFichasDBW=:=0.
@@ -42,14 +42,15 @@ puede_ganar_dbw(NumFichasDBW):-
 ganar_dbw(ValHeur):-
     ValHeur is 0.
 
-calcula_val_heur_mejor_mov(ValI,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,NumFichasTab,P):-
+calcula_val_heur_mejor_mov(ValI,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,NumFichasTab,ValHeur):-
     %%Calculando pongo en lado derecho
-    calcula(ValI,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,NumFichasTab,P).
+    calcula(ValI,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,NumFichasTab,P),
+    ValHeur is -100*P.
 
-calcula(ValI,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,NumFichasTab,ValHeur):-
+calcula(ValI,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,NumFichasTab,P):-
     calcula_probabilidad(ValI,NumFichasPuntos,NumFichasOp,NumFichasDBW,NumFichasTab,PI),
     calcula_probabilidad(ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,NumFichasTab,PD),
-    ValHeur is max(PI,PD).
+    P is max(PI,PD).
 
 calcula_probabilidad(Val,NumFichasPuntos,NumFichasOp,NumFichasDBW,NumFichasTab,P):-
     nth0(Val,NumFichasPuntos,NumFichaVal),

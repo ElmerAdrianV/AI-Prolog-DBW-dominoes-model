@@ -1,7 +1,7 @@
 :- dynamic
     fichas/1.
 
-carga_archivos:-
+carga_archivos_ah:-
     [funcion_heuristica],
     [factorial],
     [domino_ed],
@@ -93,6 +93,7 @@ generar_estado_actual(State):-
     cuenta_fichas_tablero(NumFichasTab),
     encontrar_fichas_posibles_dbw(ListaFichasPosibles),
     generar_mano_dbw(ListaManoDBW),
+    generar_pozo(ListaPozo),
     State = [
         ValI,
         ValD,
@@ -101,10 +102,14 @@ generar_estado_actual(State):-
         NumFichasDBW,
         ListaFichasPosibles,
         ListaManoDBW,
+        ListaPozo,
         NumFichasTab
     ].
 
 %%Necesitamos un replace nth element
+
+generar_pozo(ListaPozo):-
+    findall(X, pozo(X), ListaPozo).
 
 generar_mano_dbw(ListaManoDBW):-
     findall(X, mano_dbw(X), ListaManoDBW).
@@ -127,7 +132,7 @@ encontrar_fichas_posibles(ValI, ValD, [Ficha|Mano], [Ficha|Lista]):-
     encontrar_fichas_posibles(ValI, ValD, Mano, Lista).
 
 
-encontrar_fichas_posibles(ValI, ValD, [Ficha|Mano], Lista):-
+encontrar_fichas_posibles(ValI, ValD, [_|Mano], Lista):-
     encontrar_fichas_posibles(ValI, ValD, Mano, Lista).
 
 
