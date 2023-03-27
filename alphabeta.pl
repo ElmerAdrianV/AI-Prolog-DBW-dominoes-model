@@ -8,15 +8,10 @@ carga_archivos_ab:-
     [domino_ed],
     [auxiliar_heuristico].
 
-comienza_maximizacion(FichaAJugar):-
-    generar_estado_actual(State),
-    alphabeta(State,4,FichaAJugar).
-alphabeta(State,Depth,FichaAJugar):-
-    nth0(0,State,ValI),
-    nth0(1,State,ValD),
-    nth0(7,State,ManoDBW),
-    encontrar_fichas_posibles(ValI, ValD, ManoDBW,ListaFichasPosibles).
-    %% hacer una lista que guarde la ficha y el valor heuristico que regresa para cada una
+alphabeta(State,Depth,ValHeur):-
+    alpha(-100000000),
+    beta(100000000),
+    poda_alphabeta(State,Depth,1,ValHeur).
 
 %%caso de profundidad 0
 poda_alphabeta(State,0,1,ValHeur):-
@@ -114,7 +109,7 @@ genera_estados_posibles(State,Jugador,[Ficha|FichasPosibles], [NuevoEstado1,Nuev
 genera_estados_posibles(State,Jugador,[[Val1,Val2]|FichasPosibles], [NuevoEstado|ListaEstados]):-
     nth0(0,State,ValI),
     nth0(1,State,ValD),
-    (Val1 == ValD ; Val2 == ValD -> Lado is "D" ; Lado is "I"),!, 
+    (Val1 == ValD ; Val2 == ValD -> Lado = "D" ; Lado = "I"),!, 
     generar_estado_nuevo([Val1,Val2], State, Lado, Jugador, NuevoEstado),
     genera_estados_posibles(State,Jugador,FichasPosibles, ListaEstados).
 
