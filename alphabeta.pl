@@ -1,12 +1,13 @@
 dynamic:-
-    alpha/2,
-    beta/2.
+    alpha/1,
+    beta/1.
 
 repite.
 repite:-
 	repite.
 
-carga_archivos:-
+carga_archivos_ab:-
+    [factorial],
     [funcion_heuristica],
     [domino_ed],
     [auxiliar_heuristico].
@@ -21,6 +22,97 @@ alphabeta(State,Depth,FichaAJugar):-
     encontrar_fichas_posibles(ValI, ValD, ManoDBW,ListaFichasPosibles).
     %% hacer una lista que guarde la ficha y el valor heuristico que regresa para cada una
 
+%%caso de profundidad 0
+poda_alphabeta(State,0,1,ValHeur):-
+    funcion_heuristica(State,ValHeur),!.
+
+%% casos de nodo terminal
+
+%% no puede poner DBW
+poda_alphabeta(State,Depth,1,ValHeur):-
+    nth(5, State, ListaFichasPosibles),
+    length(ListaFichasPosibles,0),
+    no_puede_poner_dbw(ValHeur),!.
+
+%% no puede poner OP
+poda_alphabeta(State,Depth,0,ValHeur):-
+    nth(5, State, ListaFichasPosibles),
+    length(ListaFichasPosibles,0),
+    ValHeur is 0,!.
+
+%%empate
+poda_alphabeta(State,Depth,1,ValHeur):-
+    nth0(0,State,ValI),
+    nth0(1,State,ValD),
+    nth0(2,State,NumFichasPuntos),
+    empate(ValI,ValD,NumFichasPuntos),
+    empato_dbw(ValHeur),!.
+%%gano dbw 
+poda_alphabeta(State,Depth,_,ValHeur):-
+    nth0(4,State,NumFichasDBW),
+    puede_ganar_dbw(NumFichasDBW),
+    gano_dbw(ValHeur),!.
+
+%%perdio dbw
+poda_alphabeta(State,Depth,_,ValHeur):-
+    nth0(3,State,NumFichasOp),
+    perdio_dbw(NumFichasOp),
+    perdio_dbw_val_heur(ValHeur),!.
+
+%%estado maximizador
+poda_alphabeta(State,Depth,1,ValHeur):-
+    NewDepth is Depth - 1, 
+    genera_todos_estados_posibles(State,"DBW",ListaEstados),
+    itera_estados_max(ListaEstados, NewDepth, 0),
+    alpha(ValHeur).
+
+itera_estados_max([State|Resto],Depth,Player):-
+    alpha(Alpha),
+    beta(Beta),
+    poda_alphabeta(State,Depth,Player,ValHeur),
+    MaxAlpha is max(ValHeur, Alpha),
+    retractall(alpha),
+    asserta(alpha(MaxAlpha)),
+    ( Beta =< MaxAlpha ; length(Resto,0) ->
+        true;
+        itera_sobre_esto(Resto,Depth,Player)
+    ).
+
+
+%%estado minimizador
+poda_alphabeta(State,ListaFichasPosibles,Depth,0,ValHeur):-
+    NewDepth is Depth - 1, 
+    genera_todos_estados_posibles(State, "OP", ListaEstados),
+    itera_estados_min(ListaEstados, NewDepth, 1),
+    beta(ValHeur).
+
+itera_estados_min([State|Resto],Depth,Player):-
+    alpha(Alpha),
+    beta(Beta),
+    poda_alphabeta(State,Depth,Player,ValHeur),
+    MinBeta is min(ValHeur, Beta),
+    retractall(beta),
+    asserta(beta(MinBeta)),
+    ( Alpha =< MinBeta ; length(Resto,0) ->
+        true;
+        itera_estados_min(Resto,Depth,Player)
+    ).
+
+genera_estados_posibles(State,Player,[Ficha|ListaFichasPosibles], [NewState| Resto]):-
+    generar_estado_nuevo(State,Ficha,"D",Jugador,Lado).
+
+genera_estados_posibles([], _, _, ListaAux, ListaAux):-
+
+%%Player 1 = DBW
+%%Player 0 = OP
+
+genera_estados_posibles(State,Jugador,[[Val1,Val2]|FichasPosibles], ListaEstados):-
+    nth0(0,State,ValI),
+    nth0(1,State,ValD),
+    (Val1 == ValD ; Val2 == ValD -> Lado is "D" ; Lado is "I"), 
+    generar_estado_nuevo([Val1,Val2], State, Lado, Jugador, NuevoEstado), 
+    append(NuevoEstado, ListaEstados, NewListaEstados ),
+    pasar_por_fichas(State, Jugador,FichasPosibles, NewListaEstados).
 
 %%Player 1 = DBW
 %%Player 0 = OP
@@ -74,11 +166,6 @@ generar_estado_nuevo([Val1,Val2], State, Dir, Jugador, NewState):-
     write(NewValI), nl,  write(NewValD), nl, write(NewNumFichasPuntos), nl,  write(NewNumFichasOp), nl,
     write(NewNumFichasDBW), nl,  write(NewListaFichasPosibles), nl,  write(NewListaManoDBW), nl.
 
-poda_alphabeta(State,ListaFichasPosibles,Depth):-
-    NewDepth is Depth - 1,
-    poda_alphabeta(State,ListaFichasPosibles,NewDepth, 0).
-poda_alphabeta(State,ListaFichasPosibles,Depth, 0):-
-    poda_alphabeta(State,ListaFichasPosibles,Depth, 1).
 
 finish_search(Depth,State):-
     Depth=:=0,!;

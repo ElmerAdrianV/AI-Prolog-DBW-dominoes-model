@@ -1,7 +1,7 @@
 :- dynamic
     fichas/1.
 
-carga_archivos:-
+carga_archivos_ah:-
     [funcion_heuristica],
     [factorial],
     [domino_ed],
