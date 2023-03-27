@@ -17,7 +17,7 @@ alphabeta(State,Depth,ValHeur):-
     nth0(5, State, ListaFichasPosibles),
     poda_alphabeta(State,ListaFichasPosibles,Depth,0,ValHeur),
     retractall(alpha),
-    retractall(beta).
+    retractall(beta),!.
 
 %%caso de profundidad 0
 poda_alphabeta(State,_,0,1,ValHeur):-
@@ -26,12 +26,12 @@ poda_alphabeta(State,_,0,1,ValHeur):-
 %% casos de nodo terminal
 
 %% no puede poner DBW
-poda_alphabeta(State,ListaFichasPosibles,_,1,ValHeur):-
+poda_alphabeta(_,ListaFichasPosibles,_,1,ValHeur):-
     length(ListaFichasPosibles,0),
     no_puede_poner_dbw(ValHeur),!.
 
 %% no puede poner OP
-poda_alphabeta(State,ListaFichasPosibles,_,0,ValHeur):-
+poda_alphabeta(_,ListaFichasPosibles,_,0,ValHeur):-
     length(ListaFichasPosibles,0),
     ValHeur is 0,!.
 
@@ -60,6 +60,14 @@ poda_alphabeta(State,ListaFichasPosibles,Depth,1,ValHeur):-
     genera_estados_posibles(State, "DBW",ListaFichasPosibles,ListaEstados),!,
     itera_estados_max(ListaEstados, NewDepth, 0),
     alpha(ValHeur).
+%%estado minimizador
+
+poda_alphabeta(State,ListaFichasPosibles,Depth,0,ValHeur):-
+    NewDepth is Depth - 1, 
+    genera_estados_posibles(State, "OP",ListaFichasPosibles, ListaEstados),!,
+    itera_estados_min(ListaEstados, NewDepth, 1),
+    beta(ValHeur).
+%%estado maximizador
 
 itera_estados_max([State|Resto],Depth,Player):-
     alpha(Alpha),
@@ -76,11 +84,6 @@ itera_estados_max([State|Resto],Depth,Player):-
 
 
 %%estado minimizador
-poda_alphabeta(State,ListaFichasPosibles,Depth,0,ValHeur):-
-    NewDepth is Depth - 1, 
-    genera_estados_posibles(State, "OP",ListaFichasPosibles, ListaEstados),!,
-    itera_estados_min(ListaEstados, NewDepth, 1),
-    beta(ValHeur).
 
 itera_estados_min([State|Resto],Depth,Player):-
     alpha(Alpha),
@@ -186,12 +189,14 @@ generar_estado_nuevo([Val1,Val2], State, Dir, Jugador, NewState):-
     ].
 
 %% State i, Ficha o, Lado o
-dame_mejor_ficha(State,Ficha,Lado):-
+dame_mejor_ficha(State):-
     nth0(0,State,ValI),
     nth0(1,State,ValD),
     nth0(5,State,ListaFichasPosibles), 
     regresar_estado_fichas_posibles(State, ListaFichasPosibles, ValI, ValD, ListaEstadosFichaLado),
-    regresar_valor_heuristico_cada_estado(ListaEstadosFichaLado, ListaEstadosFichaLadoAlfaBeta).
+    regresar_valor_heuristico_cada_estado(ListaEstadosFichaLado, ListaEstadosFichaLadoAlfaBeta, ListaValores),
+    max_list(ListaValores,ValMax),
+    regresar_maximo_valor_ficha(ListaEstadosFichaLadoAlfaBeta, ValorMax).
 
 regresar_estado_fichas_posibles(_, [], _, _, []):- !.
 
@@ -201,5 +206,13 @@ regresar_estado_fichas_posibles(State, [[Val1,Val2]|FichasPosibles], ValI, ValD,
     generar_estado_nuevo([Val1,Val2], State, Lado, "DBW", NewState), 
     regresar_estado_fichas_posibles(State, FichasPosibles, ValI,ValD, ListaEstadosFichaLado).
 
-regresar_valor_heuristico_cada_estado([[State, Ficha, Lado]|ListaEstadosFichaLado], [[Valor,Ficha,Lado]|Lista]):- 
-    alphabeta(State, 5, FichaAJugar).
+regresar_valor_heuristico_cada_estado([],[], []):-!.
+
+regresar_valor_heuristico_cada_estado([[State, Ficha, Lado]|ListaEstadosFichaLado], [[Valor,Ficha,Lado]|Lista], [Valor|ListaValores]):- 
+    alphabeta(State, 5, Valor),
+    regresar_valor_heuristico_cada_estado(ListaEstadosFichaLado,Lista, ListaValores).
+
+regresar_maximo_valor_ficha([], _):- !.
+
+regresar_maximo_valor_ficha([[Valor,Ficha,Lado]|ListaEstadosFichaLadoAlfaBeta], ValorMax):-
+    (Valor == ValorMax -> write("Ficha = "),write( Ficha),write( ", lado = "), write(Lado),! ; regresar_maximo_valor_ficha(ListaEstadosFichaLadoAlfaBeta,ValorMax).).
