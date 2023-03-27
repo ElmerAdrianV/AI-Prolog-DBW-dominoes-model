@@ -15,7 +15,9 @@ alphabeta(State,Depth,ValHeur):-
     asserta(alpha(-100000000)),
     asserta(beta(100000000)),
     nth0(5, State, ListaFichasPosibles),
-    poda_alphabeta(State,ListaFichasPosibles,Depth,0,ValHeur).
+    poda_alphabeta(State,ListaFichasPosibles,Depth,0,ValHeur),
+    retractall(alpha),
+    retractall(beta).
 
 %%caso de profundidad 0
 poda_alphabeta(State,_,0,1,ValHeur):-
@@ -55,8 +57,7 @@ poda_alphabeta(State,_,_,_,ValHeur):-
 %%estado maximizador
 poda_alphabeta(State,ListaFichasPosibles,Depth,1,ValHeur):-
     NewDepth is Depth - 1, 
-    write("Busco estados_posibles DBW"),nl,
-    genera_estados_posibles(State, "DBW",ListaFichasPosibles,ListaEstados),
+    genera_estados_posibles(State, "DBW",ListaFichasPosibles,ListaEstados),!,
     itera_estados_max(ListaEstados, NewDepth, 0),
     alpha(ValHeur).
 
@@ -69,16 +70,15 @@ itera_estados_max([State|Resto],Depth,Player):-
     retractall(alpha),
     asserta(alpha(MaxAlpha)),
     ( Beta =< MaxAlpha ; length(Resto,0) ->
-        true;
-        itera_sobre_esto(Resto,Depth,Player)
+        !;
+        itera_estados_max(Resto,Depth,Player)
     ).
 
 
 %%estado minimizador
 poda_alphabeta(State,ListaFichasPosibles,Depth,0,ValHeur):-
     NewDepth is Depth - 1, 
-    genera_estados_posibles(State, "OP",ListaFichasPosibles, ListaEstados),
-    write("Genere los estados_posibles OP"),nl,
+    genera_estados_posibles(State, "OP",ListaFichasPosibles, ListaEstados),!,
     itera_estados_min(ListaEstados, NewDepth, 1),
     beta(ValHeur).
 
@@ -91,7 +91,7 @@ itera_estados_min([State|Resto],Depth,Player):-
     retractall(beta),
     asserta(beta(MinBeta)),
     ( Alpha =< MinBeta ; length(Resto,0) ->
-        true;
+        !;
         itera_estados_min(Resto,Depth,Player)
     ).
 
@@ -162,7 +162,7 @@ generar_estado_nuevo([Val1,Val2], State, Dir, Jugador, NewState):-
         encontrar_fichas_posibles(NewValI, NewValD, NewListaPozo, NewListaFichasPosibles),
         NewNumFichasDBW is NumFichasDBW - 1, 
         NewNumFichasOp is NumFichasOp, 
-        NewNumFichasPuntos = NumFichasPuntos
+        NewFinalNumFichasPuntos = NumFichasPuntos
         ;
         delete(ListaPozo, [Val1,Val2], NewListaPozo), 
         NewListaManoDBW = ListaManoDBW,
@@ -170,7 +170,7 @@ generar_estado_nuevo([Val1,Val2], State, Dir, Jugador, NewState):-
         nth0(Val1,NumFichasPuntos,Val1NumFichas), NewVal1NumFichas is Val1NumFichas - 1, replace(Val1,NumFichasPuntos,NewVal1NumFichas,NewNumFichasPuntos), 
         nth0(Val2,NumFichasPuntos,Val2NumFichas), NewVal2NumFichas is Val2NumFichas - 1, replace(Val2,NewNumFichasPuntos,NewVal2NumFichas,NewFinalNumFichasPuntos),
         NewNumFichasOp is NumFichasOp - 1,
-        NewNumFichasDBW = NumFichasDBW),
+        NewNumFichasDBW is NumFichasDBW),
     
     NewNumFichasTab is NumFichasTab + 1,
     NewState = [
