@@ -14,57 +14,57 @@ carga_archivos_ab:-
 alphabeta(State,Depth,ValHeur):-
     asserta(alpha(-100000000)),
     asserta(beta(100000000)),
-    poda_alphabeta(State,Depth,0,ValHeur).
+    nth0(5, State, ListaFichasPosibles),
+    poda_alphabeta(State,ListaFichasPosibles,Depth,0,ValHeur).
 
 %%caso de profundidad 0
-poda_alphabeta(State,0,1,ValHeur):-
+poda_alphabeta(State,_,0,1,ValHeur):-
     funcion_heuristica(State,ValHeur),!.
 
 %% casos de nodo terminal
 
 %% no puede poner DBW
-poda_alphabeta(State,_,1,ValHeur):-
-    nth(5, State, ListaFichasPosibles),
+poda_alphabeta(State,ListaFichasPosibles,_,1,ValHeur):-
     length(ListaFichasPosibles,0),
     no_puede_poner_dbw(ValHeur),!.
 
 %% no puede poner OP
-poda_alphabeta(State,_,0,ValHeur):-
-    nth(5, State, ListaFichasPosibles),
+poda_alphabeta(State,ListaFichasPosibles,_,0,ValHeur):-
     length(ListaFichasPosibles,0),
     ValHeur is 0,!.
 
 %%empate
-poda_alphabeta(State,_,1,ValHeur):-
+poda_alphabeta(State,_,_,1,ValHeur):-
     nth0(0,State,ValI),
     nth0(1,State,ValD),
     nth0(2,State,NumFichasPuntos),
     empate(ValI,ValD,NumFichasPuntos),
     empato_dbw(ValHeur),!.
 %%gano dbw 
-poda_alphabeta(State,_,_,ValHeur):-
+poda_alphabeta(State,_,_,_,ValHeur):-
     nth0(4,State,NumFichasDBW),
     puede_ganar_dbw(NumFichasDBW),
     gano_dbw(ValHeur),!.
 
 %%perdio dbw
-poda_alphabeta(State,_,_,ValHeur):-
+poda_alphabeta(State,_,_,_,ValHeur):-
     nth0(3,State,NumFichasOp),
     perdio_dbw(NumFichasOp),
-    perdio_dbw_val_heur(ValHeur),!.
+    perdio_dbw_val_heur(ValHeur),!,.
 
 %%estado maximizador
-poda_alphabeta(State,Depth,1,ValHeur):-
+poda_alphabeta(State,ListaFichasPosibles,Depth,1,ValHeur):-
     NewDepth is Depth - 1, 
-    nth0(5,State,ListaFichasPosibles),
-    genera_todos_estados_posibles(State, ListaFichasPosibles,"DBW",ListaEstados),
+    write("Busco estados_posibles DBW"),nl,
+    genera_estados_posibles(State, "DBW",ListaFichasPosibles,ListaEstados),
     itera_estados_max(ListaEstados, NewDepth, 0),
     alpha(ValHeur).
 
 itera_estados_max([State|Resto],Depth,Player):-
     alpha(Alpha),
     beta(Beta),
-    poda_alphabeta(State,Depth,Player,ValHeur),
+    nth0(5, State, ListaFichasPosibles),
+    poda_alphabeta(State,ListaFichasPosibles,Depth,Player,ValHeur),
     MaxAlpha is max(ValHeur, Alpha),
     retractall(alpha),
     asserta(alpha(MaxAlpha)),
@@ -77,15 +77,16 @@ itera_estados_max([State|Resto],Depth,Player):-
 %%estado minimizador
 poda_alphabeta(State,ListaFichasPosibles,Depth,0,ValHeur):-
     NewDepth is Depth - 1, 
-    nth0(5,State,ListaFichasPosibles),
-    genera_todos_estados_posibles(State, ListaFichasPosibles,"OP", ListaEstados),
+    genera_estados_posibles(State, "OP",ListaFichasPosibles, ListaEstados),
+    write("Genere los estados_posibles OP"),nl,
     itera_estados_min(ListaEstados, NewDepth, 1),
     beta(ValHeur).
 
 itera_estados_min([State|Resto],Depth,Player):-
     alpha(Alpha),
     beta(Beta),
-    poda_alphabeta(State,Depth,Player,ValHeur),
+    nth0(5, State, ListaFichasPosibles),
+    poda_alphabeta(State,ListaFichasPosibles,Depth,Player,ValHeur),
     MinBeta is min(ValHeur, Beta),
     retractall(beta),
     asserta(beta(MinBeta)),
