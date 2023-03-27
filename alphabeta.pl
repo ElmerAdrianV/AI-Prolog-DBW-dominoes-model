@@ -118,10 +118,17 @@ write_estados([]):-!.
 write_estados([Estado|Resto]):-
     write_estado(Estado),
     write_estados(Resto).
-write_estado([ValI,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,ListaFichasPosibles,ListaManoDBW]):-
+write_estado([ValI,ValD,NumFichasPuntos,NumFichasOp,NumFichasDBW,ListaFichasPosibles,ListaManoDBW, ListaPozo,NumFichasTab]):-
     write("Estado"),nl,
-    write(ValI), nl,  write(ValD), nl, write(NumFichasPuntos), nl,  write(NumFichasOp), nl,
-    write(NumFichasDBW), nl,  write(ListaFichasPosibles), nl,  write(ListaManoDBW), nl.
+    write("ValI: "),write(ValI), nl,  
+    write("ValD: "),write(ValD), nl, 
+    write("NumFichasPuntos: "),write(NumFichasPuntos), nl,  
+    write("NumFichasOp: "),write(NumFichasOp), nl,
+    write("NumFichasDBW: "),write(NumFichasDBW), nl,  
+    write("ListaFichasPosibles: "),write(ListaFichasPosibles), nl,  
+    write("ListaManoDBW: "),write(ListaManoDBW), nl,
+    write("ListaPozo: "),write(ListaPozo), nl,
+    write("NumFichasTab: "),write(NumFichasTab), nl.
 
 
 %%Player 1 = DBW
@@ -164,7 +171,7 @@ generar_estado_nuevo([Val1,Val2], State, Dir, Jugador, NewState):-
         NewNumFichasOp is NumFichasOp - 1,
         NewNumFichasDBW = NumFichasDBW),
     
-    NewNumFichasTab = NumFichasTab + 1,
+    NewNumFichasTab is NumFichasTab + 1,
     NewState = [
         NewValI, 
         NewValD, 
